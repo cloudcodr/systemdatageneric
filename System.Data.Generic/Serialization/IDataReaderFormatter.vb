@@ -28,7 +28,7 @@ Namespace Serialization.Formatters
         ''' Deserializes the data on the provided DataReader and reconstitutes the graph of objects.
         ''' </summary>
         ''' <param name="reader">The DataReader that contains the data to deserialize.</param>
-        ''' <returns></returns>
+        ''' <returns>Deserialized object from the reader.</returns>
         ''' <remarks></remarks>
         Function Deserialize(reader As IDataReader) As Object
     End Interface
@@ -36,7 +36,7 @@ Namespace Serialization.Formatters
     ''' <summary>
     ''' Provides functionality for formattering DataReader and objects.
     ''' </summary>
-    ''' <typeparam name="T"></typeparam>
+    ''' <typeparam name="T">Type of object.</typeparam>
     ''' <remarks></remarks>
     Public Interface IDataReaderFormatter(Of T)
         ''' <summary>
@@ -50,7 +50,7 @@ Namespace Serialization.Formatters
         ''' Deserializes the data on the provided DataReader and reconstitutes the graph of objects.
         ''' </summary>
         ''' <param name="reader">The DataReader that contains the data to deserialize.</param>
-        ''' <returns></returns>
+        ''' <returns>Deserialized object of type T from the reader.</returns>
         ''' <remarks></remarks>
         Function Deserialize(reader As IDataReader) As T
     End Interface

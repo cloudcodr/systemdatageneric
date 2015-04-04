@@ -1,0 +1,3 @@
+﻿Add Property or Settings to the SDC framework. Either a settings class (shared) or to the DataSource class.
+	ThreatMinValueAsNull		Will instruct the Serializer to pass "NULL" to the SQL statement of PrepareSQL 
+								should the value be of minvalue or Empty.

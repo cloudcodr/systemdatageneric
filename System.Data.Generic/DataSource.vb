@@ -255,6 +255,11 @@ Public NotInheritable Class DataSource
     ''' <returns>The first column of the first row in the result set, or a null reference (Nothing in Visual Basic) if the result set is empty. Returns a maximum of 2033 characters.</returns>
     ''' <remarks></remarks>
     Public Function ExecuteScalar(Of T)(ByVal SQL As String, transaction As TransactionContext, ByVal defaultValue As T) As T
+        ' validate SQL input
+        If String.IsNullOrEmpty(SQL) Then
+            Throw New ArgumentNullException("SQL must be explicitly stated.")
+        End If
+
         ' set defaults
         Dim dataValue As Object = Nothing
 
@@ -299,6 +304,11 @@ Public NotInheritable Class DataSource
     ''' <returns>The first column of the first row in the result set, or a null reference (Nothing in Visual Basic) if the result set is empty. Returns a maximum of 2033 characters.</returns>
     ''' <remarks></remarks>
     Public Function ExecuteScalar(Of T)(ByVal SQL As String, ByVal defaultValue As T) As T
+        ' validate SQL input
+        If String.IsNullOrEmpty(SQL) Then
+            Throw New ArgumentNullException("SQL must be explicitly stated.")
+        End If
+
         ' set defaults
         Dim dataValue As Object = Nothing
 
@@ -363,6 +373,11 @@ Public NotInheritable Class DataSource
     ''' <param name="SQL">SQL statement to execute.</param>
     ''' <remarks></remarks>
     Public Sub ExecuteNoReturn(ByVal SQL As String)
+        ' validate SQL input
+        If String.IsNullOrEmpty(SQL) Then
+            Throw New ArgumentNullException("SQL must be explicitly stated.")
+        End If
+
         Using dataConnection As SqlConnection = New SqlConnection(Me.ConnectionString)
             dataConnection.Open()
 
@@ -430,6 +445,11 @@ Public NotInheritable Class DataSource
     ''' <returns>DataSet of the data.</returns>
     ''' <remarks></remarks>
     Public Function ExecuteDataSet(ByVal SQL As String) As DataSet
+        ' validate SQL input
+        If String.IsNullOrEmpty(SQL) Then
+            Throw New ArgumentNullException("SQL must be explicitly stated.")
+        End If
+
         Dim dataReturnSet As DataSet = New DataSet
 
         Using dataConnection As SqlConnection = New SqlConnection(Me.ConnectionString)
@@ -468,6 +488,11 @@ Public NotInheritable Class DataSource
     ''' <returns>XmlReader.</returns>
     ''' <remarks></remarks>
     Public Function ExecuteXmlReader(ByVal SQL As String) As XmlReader
+        ' validate SQL input
+        If String.IsNullOrEmpty(SQL) Then
+            Throw New ArgumentNullException("SQL must be explicitly stated.")
+        End If
+
         Dim dataXmlReader As XmlReader = Nothing
 
         Using dataConnection As SqlConnection = New SqlConnection(Me.ConnectionString)
@@ -505,6 +530,11 @@ Public NotInheritable Class DataSource
     ''' <returns>SqlDataReader.</returns>
     ''' <remarks>The ExecuteReader method keeps the connection open. Dispose of the <see cref="System.Data.Common.DbDataReader">DbDataReader</see> will close the connection.</remarks>
     Public Function ExecuteReader(ByVal SQL As String) As IDataReader
+        ' validate SQL input
+        If String.IsNullOrEmpty(SQL) Then
+            Throw New ArgumentNullException("SQL must be explicitly stated.")
+        End If
+
         Dim dataReader As SqlDataReader = Nothing
 
         Dim dataConnection As SqlConnection = New SqlConnection(Me.ConnectionString)
@@ -537,6 +567,11 @@ Public NotInheritable Class DataSource
     ''' <returns>Dictionary class.</returns>
     ''' <remarks></remarks>
     Public Function ExecuteDictionary(ByVal SQL As String) As Dictionary(Of String, Object)
+        ' validate SQL input
+        If String.IsNullOrEmpty(SQL) Then
+            Throw New ArgumentNullException("SQL must be explicitly stated.")
+        End If
+
         Dim dataDictionary As Dictionary(Of String, Object) = New Dictionary(Of String, Object)
 
         Using dataConnection As SqlConnection = New SqlConnection(Me.ConnectionString)
@@ -585,6 +620,11 @@ Public NotInheritable Class DataSource
     ''' <returns>DataTable.</returns>
     ''' <remarks></remarks>
     Public Function ExecuteDataTable(ByVal SQL As String) As DataTable
+        ' validate SQL input
+        If String.IsNullOrEmpty(SQL) Then
+            Throw New ArgumentNullException("SQL must be explicitly stated.")
+        End If
+
         Dim dataReturnSet As DataSet = New DataSet
 
         Using dataConnection As SqlConnection = New SqlConnection(Me.ConnectionString)
