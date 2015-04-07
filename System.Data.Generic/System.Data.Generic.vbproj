@@ -79,6 +79,7 @@
     <Compile Include="Serialization\DataSourceFormatter.vb" />
     <Compile Include="Serialization\DataSourceFormatterServices.vb" />
     <Compile Include="Serialization\IDataReaderFormatter.vb" />
+    <Compile Include="Serialization\SerializationSettings.vb" />
     <Compile Include="Settings\AzureApplicationSettings.vb" />
     <Compile Include="Settings\ConfigurationHelper.vb" />
     <Compile Include="ConnectionStringBuilder.vb" />

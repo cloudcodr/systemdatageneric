@@ -49,10 +49,10 @@ Public NotInheritable Class DataSource
     Implements IDisposable
 
 #Region "Member variables"
-    'Private _dataConnection As SqlConnection
     Private _connectionString As String
 
-    Private Shared _instance As DataSource
+    Private Shared _instance As DataSource = Nothing
+    Private Shared _serializationSettings As SerializationSettings = Nothing
 #End Region
 
 #Region "Constructor"
@@ -108,7 +108,6 @@ Public NotInheritable Class DataSource
     Public Shared ReadOnly Property Current As DataSource
         Get
             If _instance Is Nothing Then
-                'Dim connectionString As String = Configuration.ConfigurationManager.ConnectionStrings("GlobalDataSource").ConnectionString
                 Dim connectionString As String = ConfigurationHelper.GetSetting("GlobalDataSource")
 
                 If String.IsNullOrEmpty(connectionString) Then
@@ -170,11 +169,6 @@ Public NotInheritable Class DataSource
     <Obsolete("You can remove Open. Does not be used anymore.")>
     Public ReadOnly Property ConnectionState As ConnectionState
         Get
-            'If _dataConnection IsNot Nothing Then
-            '    Return _dataConnection.State
-            'Else
-            '    Return Data.ConnectionState.Closed
-            'End If
             Return Data.ConnectionState.Connecting
         End Get
     End Property
@@ -188,6 +182,22 @@ Public NotInheritable Class DataSource
     Public ReadOnly Property ConnectionString As String
         Get
             Return _connectionString
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Returns the settings for serialization.
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns>Settings class for the supporting serializer.</returns>
+    ''' <remarks></remarks>
+    Public Shared ReadOnly Property SerializationSettings As SerializationSettings
+        Get
+            If _serializationSettings Is Nothing Then
+                _serializationSettings = New SerializationSettings()
+            End If
+
+            Return _serializationSettings
         End Get
     End Property
 #End Region
