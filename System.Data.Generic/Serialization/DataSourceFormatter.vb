@@ -26,21 +26,71 @@ Namespace Serialization.Formatters
         Implements IDataReaderFormatter(Of T)
 
         ''' <summary>
-        ''' Deserialize a data row from the reader.
+        ''' Deserialize a data row into an object of type T, navigating the properties and related tables from the reader.
         ''' </summary>
         ''' <param name="reader">DataReader to return row from.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
+        Public Function DeserializeNested(reader As IDataReader) As T Implements IDataReaderFormatter(Of T).DeserializeNested
+            ' get the type list nested
+            Dim members As List(Of PropertyInfo) = Nothing
+            DataSourceFormatterServices.GetSerializableProperties(GetType(T), True, members)
+
+            ' instanciate a new version
+            Dim instance As Object = FormatterServices.GetSafeUninitializedObject(GetType(T))
+            instance = instance
+
+
+
+
+
+            Return instance
+
+
+            'Dim members() As PropertyInfo = DataSourceFormatterServices.GetSerializableProperties(GetType(T))
+            ''Dim u = members(0).PropertyPath
+            'u = u
+
+            For Each m As PropertyInfo In members
+                Console.WriteLine(m.PropertyPath)
+            Next
+
+            Throw New NotImplementedException
+
+            ' retrieve property info array for the type and navigate any child properties
+            ' that is not of IsSystemType
+            '    Dim nestedMembers() As PropertyInfoList
+
+            '     Dim schemaDt = dataReader.GetSchemaTable()
+
+
+        End Function
+
+        ''' <summary>
+        ''' Deserialize a data row from the reader.
+        ''' </summary>
+        ''' <param name="reader">DataReader to return row from.</param>
+        ''' <returns>Object of type T, deserialized from the provided DataReader.</returns>
+        ''' <remarks></remarks>
         Public Function Deserialize(reader As IDataReader) As T Implements IDataReaderFormatter(Of T).Deserialize
-            'Dim members() As MemberInfo = DataSourceFormatterServices.GetSerializableMembers(GetType(T))
+            ' retrieve property info array for the type
             Dim members() As PropertyInfo = DataSourceFormatterServices.GetSerializableProperties(GetType(T))
 
+            ' instanciate a new version
             Dim instance As Object = FormatterServices.GetSafeUninitializedObject(GetType(T)) ' .GetUninitializedObject(GetType(T))
-            Dim fields() As DataFieldInfo = DataSourceFormatterServices.GetFieldMembers(reader)
 
-            Dim data() As Object = MapAndDesrializePrimities(members, fields)
+            Try
+                ' get database fields
+                Dim fields() As DbColumnInfo = DataSourceFormatterServices.GetFieldMembers(reader)
 
-            DataSourceFormatterServices.PopulateObjectMembers(instance, members, data)
+                ' maps properties and fields and return data
+                Dim data() As Object = MapAndDeserializePrimities(members, fields)
+
+                ' populate the instance, properties and data
+                DataSourceFormatterServices.PopulateObjectMembers(instance, members, data)
+            Catch ex As Exception
+                Throw New SerializationException("Deserialize threw an exception.", ex)
+            End Try
 
             Return instance
         End Function
@@ -52,12 +102,12 @@ Namespace Serialization.Formatters
         ''' <param name="fields">Data fields from the data source.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function MapAndDesrializePrimities(members() As MemberInfo, fields() As DataFieldInfo) As Object()
+        Private Function MapAndDeserializePrimities(members() As MemberInfo, fields() As DbColumnInfo) As Object()
             Dim retVal As Object() = New Object(members.Length - 1) {}
 
             For i As Integer = 0 To members.Length - 1
                 'members(i).Name 
-                For Each dataField As DataFieldInfo In fields
+                For Each dataField As DbColumnInfo In fields
                     If String.Compare(dataField.FieldName, members(i).Name, True) = 0 Then
                         retVal(i) = DeserializePrimitive(dataField)
                         Exit For
@@ -74,7 +124,7 @@ Namespace Serialization.Formatters
         ''' <param name="field">Field to deserialize.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function DeserializePrimitive(field As DataFieldInfo) As Object
+        Private Function DeserializePrimitive(field As DbColumnInfo) As Object
             Dim fieldType As Type = field.RuntimeType
             Select Case Type.GetTypeCode(fieldType)
                 Case TypeCode.Char

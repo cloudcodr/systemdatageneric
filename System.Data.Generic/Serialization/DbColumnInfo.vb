@@ -13,12 +13,14 @@
 
 Namespace Serialization
     ''' <summary>
-    ''' Obtains information about the values of a data field.
+    ''' Obtains information about the values of a data column from the database.
     ''' </summary>
     ''' <remarks></remarks>
-    Friend NotInheritable Class DataFieldInfo
+    Friend NotInheritable Class DbColumnInfo
 
 #Region "Properties"
+        ' Public FieldIndex As Integer ' NOT USED
+
         ''' <summary>
         ''' Name of the datasource field.
         ''' </summary>
@@ -42,40 +44,90 @@ Namespace Serialization
 #End Region
 
 #Region "Read Methods"
-        Public Function ReadLong() As Long
+        ''' <summary>
+        ''' Returns a long from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadLong() As Long
             Return CType(FieldValue, Long)
         End Function
-        Public Function ReadInt() As Integer
+        ''' <summary>
+        ''' Returns a integer from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadInt() As Integer
             Return CType(FieldValue, Integer)
         End Function
-        Public Function ReadBool() As Boolean
+        ''' <summary>
+        ''' Returns a boolean from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadBool() As Boolean
             Return CBool(FieldValue)
         End Function
-        Public Function ReadGuid() As Guid
+        ''' <summary>
+        ''' Returns a guid from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadGuid() As Guid
             If IsDBNull(FieldValue) Then
                 FieldValue = Guid.Empty
             End If
             Return New Guid(FieldValue.ToString)
         End Function
-        Public Function ReadString() As String
+        ''' <summary>
+        ''' Returns a string from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadString() As String
             Return FieldValue.ToString
         End Function
-        Public Function ReadDateTime() As DateTime
+        ''' <summary>
+        ''' Returns a datetime from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadDateTime() As DateTime
             If IsDBNull(FieldValue) Then
                 FieldValue = DateTime.MinValue
             End If
             Return CType(FieldValue, DateTime)
         End Function
-        Public Function ReadDecimal() As Object
+        ''' <summary>
+        ''' Returns a decimal from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadDecimal() As Decimal
             Return CDec(FieldValue)
         End Function
-        Public Function ReadChar() As Object
+        ''' <summary>
+        ''' Returns a char from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadChar() As Char
             Return CChar(FieldValue)
         End Function
-        Public Function ReadSingle() As Object
+        ''' <summary>
+        ''' Returns a single from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadSingle() As Single
             Return CType(FieldValue, Single)
         End Function
-        Public Function ReadDouble() As Object
+        ''' <summary>
+        ''' Returns a decimal from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadDouble() As Double
             Return CDbl(FieldValue)
         End Function
 #End Region

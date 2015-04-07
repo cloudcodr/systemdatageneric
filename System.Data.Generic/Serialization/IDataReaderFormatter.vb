@@ -15,27 +15,6 @@ Namespace Serialization.Formatters
     ''' <summary>
     ''' Provides functionality for formattering DataReader and objects.
     ''' </summary>
-    ''' <remarks></remarks>
-    Public Interface IDataReaderFormatter
-        ''' <summary>
-        ''' Serializes an object, or graph as objects with the given root to the provided reader.
-        ''' </summary>
-        ''' <param name="reader">The DataReader where the formatter puts the serialized data.</param>
-        ''' <param name="graph">The object, or root of the object graph, to serialize.</param>
-        ''' <remarks></remarks>
-        Sub Serialize(reader As IDataReader, graph As Object)
-        ''' <summary>
-        ''' Deserializes the data on the provided DataReader and reconstitutes the graph of objects.
-        ''' </summary>
-        ''' <param name="reader">The DataReader that contains the data to deserialize.</param>
-        ''' <returns>Deserialized object from the reader.</returns>
-        ''' <remarks></remarks>
-        Function Deserialize(reader As IDataReader) As Object
-    End Interface
-
-    ''' <summary>
-    ''' Provides functionality for formattering DataReader and objects.
-    ''' </summary>
     ''' <typeparam name="T">Type of object.</typeparam>
     ''' <remarks></remarks>
     Public Interface IDataReaderFormatter(Of T)
@@ -53,5 +32,12 @@ Namespace Serialization.Formatters
         ''' <returns>Deserialized object of type T from the reader.</returns>
         ''' <remarks></remarks>
         Function Deserialize(reader As IDataReader) As T
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="reader"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Function DeserializeNested(reader As IDataReader) As T
     End Interface
 End Namespace

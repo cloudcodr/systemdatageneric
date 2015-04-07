@@ -73,11 +73,14 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\IgnorePropertyAttribute.vb" />
+    <Compile Include="Extensions\Extensions.vb" />
     <Compile Include="Factory\IDataSource.vb" />
     <Compile Include="Implementations\SqlCeDataSource.vb" />
-    <Compile Include="Serialization\DataFieldInfo.vb" />
+    <Compile Include="Serialization\DbColumnInfo.vb" />
     <Compile Include="Serialization\DataSourceFormatter.vb" />
     <Compile Include="Serialization\DataSourceFormatterServices.vb" />
+    <Compile Include="Serialization\DbTableInfo.vb" />
     <Compile Include="Serialization\IDataReaderFormatter.vb" />
     <Compile Include="Serialization\SerializationSettings.vb" />
     <Compile Include="Settings\AzureApplicationSettings.vb" />
@@ -100,7 +103,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Serialization\GenericDataFormatter.vb" />
     <Compile Include="Settings\Utilities.vb" />
     <Compile Include="SQLInjectionInspector.vb" />
     <Compile Include="TransactionContext.vb" />
@@ -127,6 +129,9 @@
   <ItemGroup>
     <Content Include="License.txt" />
     <Content Include="Workitems.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

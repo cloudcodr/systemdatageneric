@@ -9,7 +9,7 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("System.Data.Generic")> 
-<Assembly: AssemblyDescription("")> 
+<Assembly: AssemblyDescription("Provides a generic data access library.")> 
 <Assembly: AssemblyCompany("Arumsoft")> 
 <Assembly: AssemblyProduct("System.Data.Generic")> 
 <Assembly: AssemblyCopyright("Copyright © Arumsof 2015")> 
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.7.0.*")> 
-<Assembly: AssemblyFileVersion("1.7.0.5678")> 
+<Assembly: AssemblyVersion("1.7.3412.*")> 
+<Assembly: AssemblyFileVersion("1.7.3412.5678")> 

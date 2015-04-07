@@ -29,7 +29,7 @@ Namespace Serialization.Formatters
         ''' <param name="members">Properties to populare.</param>
         ''' <param name="data">Data array to pass to the properties.</param>
         ''' <remarks>Both array must have the same index.</remarks>
-        Friend Shared Sub PopulateObjectMembers(ByRef obj As Object, members As PropertyInfo(), data As Object())            
+        Friend Shared Sub PopulateObjectMembers(ByRef obj As Object, members As PropertyInfo(), data As Object())
             For i As Integer = 0 To members.Length - 1
                 Try
                     Dim p As PropertyInfo = obj.GetType().GetProperty(members(i).Name)
@@ -39,6 +39,55 @@ Namespace Serialization.Formatters
                 Catch ex As Exception
                     Throw ex
                 End Try
+            Next
+        End Sub
+
+        ''' <summary>
+        ''' Validates the property and determine if the property should be ignored.
+        ''' </summary>
+        ''' <param name="p">Property to validate.</param>
+        ''' <returns></returns>
+        ''' <remarks>Non-writable properties are ignored. And users may specify either the <see cref="Xml.Serialization.XmlIgnoreAttribute">XmlIgnoreAttribute</see> or <see cref="IgnorePropertyAttribute">IgnorePropertyAttribute</see> attribute to force exclusion.</remarks>
+        Private Shared Function IgnoreProperty(p As PropertyInfo) As Boolean
+            ' Exclude read-only
+            If Not p.CanWrite Then
+                Return True
+            End If
+            ' Check for XmlIgnore on the public field
+            If (p.GetCustomAttributes(GetType(XmlIgnoreAttribute), True).Length > 0) Then
+                Return True
+            End If
+            If (p.GetCustomAttributes(GetType(IgnorePropertyAttribute), True).Length > 0) Then
+                Return True
+            End If
+
+            Return False
+        End Function
+
+        <Obsolete()>
+        Friend Shared Function GetSafeInitializedObject(t As Type) As Object
+            Dim instance As Object = FormatterServices.GetSafeUninitializedObject(t)
+
+            Return instance
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="type"></param>
+        ''' <param name="navigateProperties">Recruisive navigation through collection properties.</param>
+        ''' <param name="list"></param>
+        ''' <remarks></remarks>
+        Friend Shared Sub GetSerializableProperties(type As Type, navigateProperties As Boolean, ByRef list As List(Of PropertyInfo))
+            If list Is Nothing Then
+                list = New List(Of PropertyInfo)
+            End If
+
+            For Each p As PropertyInfo In DataSourceFormatterServices.GetSerializableProperties(type)
+                list.Add(p)
+                If p.IsCollection() AndAlso navigateProperties Then
+                    GetSerializableProperties(p.CollectionItemType, navigateProperties, list)
+                End If
             Next
         End Sub
 
@@ -54,11 +103,9 @@ Namespace Serialization.Formatters
 
             For i As Integer = 0 To props.Length - 1
                 Dim prop As PropertyInfo = props(i)
-                ' Check for XmlIgnore on the public field
-                If (prop.GetCustomAttributes(GetType(XmlIgnoreAttribute), True).Length > 0) Then
+                If IgnoreProperty(prop) Then
                     Continue For
                 End If
-
                 countProper += 1
             Next
 
@@ -67,7 +114,7 @@ Namespace Serialization.Formatters
                 Dim properFields As PropertyInfo() = New PropertyInfo(countProper - 1) {}
                 countProper = 0
                 For i As Integer = 0 To props.Length - 1
-                    If (props(i).GetCustomAttributes(GetType(XmlIgnoreAttribute), True).Length > 0) Then
+                    If IgnoreProperty(props(i)) Then
                         Continue For
                     End If
                     properFields(countProper) = props(i)
@@ -131,11 +178,12 @@ Namespace Serialization.Formatters
         ''' <param name="reader">DataReader to read from.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function GetFieldMembers(reader As IDataReader) As DataFieldInfo()
-            Dim fields As DataFieldInfo() = New DataFieldInfo(reader.FieldCount - 1) {}
+        Public Shared Function GetFieldMembers(reader As IDataReader) As DbColumnInfo()
+            Dim fields As DbColumnInfo() = New DbColumnInfo(reader.FieldCount - 1) {}
 
             For i As Integer = 0 To reader.FieldCount - 1
-                fields(i) = New DataFieldInfo With {
+                '    .FieldIndex = reader.GetOrdinal(reader.GetName(i)),
+                fields(i) = New DbColumnInfo With {
                     .FieldName = reader.GetName(i),
                     .FieldValue = reader(i),
                     .DataTypeName = reader.GetDataTypeName(i),

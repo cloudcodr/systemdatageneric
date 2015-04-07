@@ -264,6 +264,8 @@ Public NotInheritable Class DataSource
     ''' <param name="defaultValue">Default value to return in case of no return.</param>
     ''' <returns>The first column of the first row in the result set, or a null reference (Nothing in Visual Basic) if the result set is empty. Returns a maximum of 2033 characters.</returns>
     ''' <remarks></remarks>
+    ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     Public Function ExecuteScalar(Of T)(ByVal SQL As String, transaction As TransactionContext, ByVal defaultValue As T) As T
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
@@ -382,6 +384,8 @@ Public NotInheritable Class DataSource
     ''' </summary>
     ''' <param name="SQL">SQL statement to execute.</param>
     ''' <remarks></remarks>
+    ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     Public Sub ExecuteNoReturn(ByVal SQL As String)
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
@@ -454,6 +458,8 @@ Public NotInheritable Class DataSource
     ''' <param name="SQL">SQL query to execute.</param>
     ''' <returns>DataSet of the data.</returns>
     ''' <remarks></remarks>
+    ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     Public Function ExecuteDataSet(ByVal SQL As String) As DataSet
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
@@ -497,6 +503,8 @@ Public NotInheritable Class DataSource
     ''' <param name="SQL">SQL query to execute.</param>
     ''' <returns>XmlReader.</returns>
     ''' <remarks></remarks>
+    ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     Public Function ExecuteXmlReader(ByVal SQL As String) As XmlReader
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
@@ -539,6 +547,8 @@ Public NotInheritable Class DataSource
     ''' <param name="SQL">SQL Query to execute.</param>
     ''' <returns>SqlDataReader.</returns>
     ''' <remarks>The ExecuteReader method keeps the connection open. Dispose of the <see cref="System.Data.Common.DbDataReader">DbDataReader</see> will close the connection.</remarks>
+    ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     Public Function ExecuteReader(ByVal SQL As String) As IDataReader
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
@@ -576,6 +586,8 @@ Public NotInheritable Class DataSource
     ''' <param name="SQL">SQL statement to execute.</param>
     ''' <returns>Dictionary class.</returns>
     ''' <remarks></remarks>
+    ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     Public Function ExecuteDictionary(ByVal SQL As String) As Dictionary(Of String, Object)
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
@@ -629,6 +641,8 @@ Public NotInheritable Class DataSource
     ''' <param name="SQL">SQL statement to execute.</param>
     ''' <returns>DataTable.</returns>
     ''' <remarks></remarks>
+    ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     Public Function ExecuteDataTable(ByVal SQL As String) As DataTable
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
@@ -682,6 +696,7 @@ Public NotInheritable Class DataSource
     ''' <param name="callback"><see cref="ItemCallBackDelegate">ItemCallBackDelegate</see> method.</param>
     ''' <remarks></remarks>
     ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     Public Sub ExecuteCallBack(ByVal SQL As String, ByVal callback As ItemCallBackDelegate)
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
@@ -784,6 +799,73 @@ Public NotInheritable Class DataSource
     End Function
 #End Region
 
+#Region "ExecuteNObjects"
+    ''' <summary>
+    ''' Executes the query, and returns a collection of object by the type T; hieratically compounded by the provided SQL JOIN and realted classes.
+    ''' </summary>
+    ''' <typeparam name="T">Type to return in list. This must be a managed object.</typeparam>
+    ''' <param name="SQL">SQL statement to execute. SQL statement must have an 'ORDER BY' statement. Should be a JOIN statement, otherwise please use ExecuteObjects for performance.</param>
+    ''' <returns>Collections of object, type T - populated based on class references and provided tables.</returns>
+    ''' <remarks></remarks>
+    ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
+    Public Function ExecuteNObjects(Of T As Class)(SQL As String) As List(Of T)
+        ' validate SQL input
+        If String.IsNullOrEmpty(SQL) Then
+            Throw New ArgumentNullException("SQL must be explicitly stated.")
+        End If
+
+        ' check for order by.
+        If Not SQL.Contains("order by", StringComparison.OrdinalIgnoreCase) Then
+            Throw New ArgumentException("SQL must have define ORDER BY to map objects in the right order.")
+        End If
+
+        ' setup return list
+        Dim dataReturnList As List(Of T) = New List(Of T)
+
+        ' initialize the data connection an dopen
+        Using dataConnection As SqlConnection = New SqlConnection(Me.ConnectionString)
+            dataConnection.Open()
+
+            ' build command and apply command text (SQL)
+            Dim dataCommand As SqlCommand = New SqlCommand(SQL, dataConnection)
+            dataCommand.CommandType = CommandType.Text
+
+            Try
+                ' setup formatter of type T
+                Dim sqlFormatter As New Serialization.Formatters.DataSourceFormatter(Of T)
+
+                ' important - open the connection with close and keyinfo!!
+                Using dataReader As SqlDataReader = dataCommand.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.KeyInfo)
+                    ' get schema, and pass to the deserializenested
+
+                    While dataReader.Read()
+                        ' deserialize the object and reader as a nested hieraticy.
+                        Dim dataReturn As T = sqlFormatter.DeserializeNested(dataReader)
+
+                        dataReturnList.Add(dataReturn)
+                    End While
+                    dataReader.Close()
+                End Using
+            Catch ex As System.Runtime.Serialization.SerializationException
+                Throw ex
+            Catch ex As SqlException
+                Throw ex
+            Catch ex As Exception
+                Throw ex
+            Finally
+                dataCommand.Dispose()
+                ' close and return connection to pool
+                If dataConnection.State = Data.ConnectionState.Open Then
+                    dataConnection.Close()
+                End If
+            End Try
+        End Using
+
+        Return dataReturnList
+    End Function
+#End Region
+
 #Region "ExecuteObjects"
     ''' <summary>
     ''' Executes the query, and returns a collection of object by the type T.
@@ -823,7 +905,8 @@ Public NotInheritable Class DataSource
                     End While
                     dataReader.Close()
                 End Using
-
+            Catch ex As System.Runtime.Serialization.SerializationException
+                Throw ex
             Catch ex As SqlException
                 Throw ex
             Catch ex As Exception
