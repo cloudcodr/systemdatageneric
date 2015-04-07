@@ -80,6 +80,7 @@
     <Compile Include="Serialization\DbColumnInfo.vb" />
     <Compile Include="Serialization\DataSourceFormatter.vb" />
     <Compile Include="Serialization\DataSourceFormatterServices.vb" />
+    <Compile Include="Serialization\DbSchema.vb" />
     <Compile Include="Serialization\DbTableInfo.vb" />
     <Compile Include="Serialization\IDataReaderFormatter.vb" />
     <Compile Include="Serialization\SerializationSettings.vb" />
@@ -130,9 +131,7 @@
     <Content Include="License.txt" />
     <Content Include="Workitems.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Exceptions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

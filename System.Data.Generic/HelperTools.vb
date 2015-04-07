@@ -45,18 +45,6 @@ Friend Module HelperTools
         Return TryCastDefault(Of T)(o, o)
     End Function
 
-    ' ''' <summary>
-    ' ''' Formats a SQL string with the <paramref name="parameters">parameters</paramref>, assigned the right usage of quotas.
-    ' ''' </summary>
-    ' ''' <param name="sql">SQL statement to format. Use String formatting {0}, {1} etc.</param>
-    ' ''' <param name="parameters">Array of parameters.</param>
-    ' ''' <returns>Formatted SQL string. Inspects each parameters by datatype and assigns correct T-SQL quota usage.</returns>
-    ' ''' <remarks>Example: <code>INSERT INTO MyTable (ColString, ColDate) VALUES ({0}, {1});</code></remarks>
-    'Public Function PrepareSql(ByVal sql As String, ByVal ParamArray parameters() As Object) As String
-    '    'Return String.Format(sql, parameters)
-    '    Return PrepareSqlExtended(sql, parameters)
-    'End Function
-
     ''' <summary>
     ''' Escapes standard SQL characters.
     ''' </summary>
@@ -87,7 +75,7 @@ Friend Module HelperTools
             If param Is Nothing Then param = ""
 
             If param.GetType Is GetType(String) Then
-                If String.IsNullOrEmpty(param) Then
+                If String.IsNullOrEmpty(param) AndAlso DataSource.SerializationSettings.ThreatMinValuesAsNull Then
                     stringParameters.Add("NULL")
                 Else
                     Dim paramValue As String = param.ToString
@@ -100,7 +88,7 @@ Friend Module HelperTools
                     End If
                 End If
             ElseIf param.GetType Is GetType(Guid) Then
-                If DirectCast(param, Guid) = Guid.Empty Then
+                If DirectCast(param, Guid) = Guid.Empty AndAlso DataSource.SerializationSettings.ThreatMinValuesAsNull Then
                     stringParameters.Add("NULL")
                 Else
                     stringParameters.Add("'" + param.ToString + "'")
@@ -108,13 +96,13 @@ Friend Module HelperTools
             ElseIf param.GetType Is GetType(Boolean) Then
                 stringParameters.Add(CInt(param))
             ElseIf param.GetType Is GetType(Date) Then
-                If DirectCast(param, Date) = Date.MinValue Then
+                If DirectCast(param, Date) = Date.MinValue AndAlso DataSource.SerializationSettings.ThreatMinValuesAsNull Then
                     stringParameters.Add("NULL")
                 Else
                     stringParameters.Add("'" + DirectCast(param, Date).ToString("yyyy-MM-dd") + "'")
                 End If
             ElseIf param.GetType Is GetType(DateTime) Then
-                If DirectCast(param, DateTime) = DateTime.MinValue Then
+                If DirectCast(param, DateTime) = DateTime.MinValue AndAlso DataSource.SerializationSettings.ThreatMinValuesAsNull Then
                     stringParameters.Add("NULL")
                 Else
                     stringParameters.Add("'" + DirectCast(param, DateTime).ToString("yyyy-MM-dd HH:mm:ss") + "'")

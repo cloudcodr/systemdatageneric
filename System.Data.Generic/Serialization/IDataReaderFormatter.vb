@@ -33,11 +33,12 @@ Namespace Serialization.Formatters
         ''' <remarks></remarks>
         Function Deserialize(reader As IDataReader) As T
         ''' <summary>
-        ''' 
+        ''' Deserialize a data row into an object of type T, navigating the properties and related tables from the reader.
         ''' </summary>
-        ''' <param name="reader"></param>
-        ''' <returns></returns>
+        ''' <param name="reader">DataReader to return row from.</param>
+        ''' <param name="schema">Schema of the data reader.</param>
+        ''' <returns>Returns object instance of T.</returns>
         ''' <remarks></remarks>
-        Function DeserializeNested(reader As IDataReader) As T
+        Function DeserializeNested(reader As IDataReader, schema As DbSchema) As T
     End Interface
 End Namespace

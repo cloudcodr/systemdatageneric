@@ -23,7 +23,6 @@ Public NotInheritable Class SerializationSettings
     ''' </summary>
     ''' <remarks></remarks>
     Protected Friend Sub New()
-
     End Sub
 #End Region
 
@@ -34,6 +33,6 @@ Public NotInheritable Class SerializationSettings
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks><see cref="DataSource.PrepareSql">PrepareSql</see> for processing instructions.</remarks>
-    Public Property ThreatMinValuesAsNull As Boolean
+    Public Property ThreatMinValuesAsNull As Boolean = True
 #End Region
 End Class

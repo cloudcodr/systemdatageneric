@@ -13,19 +13,32 @@
 
 Namespace Serialization
     ''' <summary>
-    ''' 
+    ''' Obtains information about the tables of a database.
     ''' </summary>
     ''' <remarks></remarks>
-    Friend NotInheritable Class DbTableInfo
+    Public NotInheritable Class DbTableInfo
+#Region "Public properties"
         ''' <summary>
         ''' Name of the data table.
         ''' </summary>
         ''' <remarks></remarks>
         Public TableName As String
         ''' <summary>
-        ''' 
+        ''' Index of the key column.
         ''' </summary>
         ''' <remarks></remarks>
         Public KeyColumnIndex As Integer
+#End Region
+
+#Region "Public methods"
+        ''' <summary>
+        ''' Returns a string representation of the DbTableInfo class.
+        ''' </summary>
+        ''' <returns>String representation.</returns>
+        ''' <remarks></remarks>
+        Public Overrides Function ToString() As String
+            Return Me.TableName + ", key column " + KeyColumnIndex.ToString
+        End Function
+#End Region
     End Class
 End Namespace

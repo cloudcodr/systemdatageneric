@@ -16,11 +16,37 @@ Namespace Serialization
     ''' Obtains information about the values of a data column from the database.
     ''' </summary>
     ''' <remarks></remarks>
-    Friend NotInheritable Class DbColumnInfo
+    Public NotInheritable Class DbColumnInfo
 
-#Region "Properties"
-        ' Public FieldIndex As Integer ' NOT USED
+#Region "Nested implementation"
+        ''' <summary>
+        ''' Gets or sets the table name of the column.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public TableName As String = String.Empty
+        ''' <summary>
+        ''' Gets or sets the column index.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public FieldIndex As Integer = -1
+        ''' <summary>
+        ''' Returns the path of the column value.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property FieldPath As String
+            Get
+                If String.IsNullOrEmpty(TableName) Then
+                    Return FieldName
+                Else
+                    Return TableName + "." + FieldName
+                End If
+            End Get
+        End Property
+#End Region
 
+#Region "Properties"        
         ''' <summary>
         ''' Name of the datasource field.
         ''' </summary>

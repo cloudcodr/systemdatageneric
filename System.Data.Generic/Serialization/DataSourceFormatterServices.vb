@@ -185,6 +185,7 @@ Namespace Serialization.Formatters
                 '    .FieldIndex = reader.GetOrdinal(reader.GetName(i)),
                 fields(i) = New DbColumnInfo With {
                     .FieldName = reader.GetName(i),
+                    .FieldIndex = reader.GetOrdinal(.FieldName),
                     .FieldValue = reader(i),
                     .DataTypeName = reader.GetDataTypeName(i),
                     .RuntimeType = reader.GetFieldType(i)

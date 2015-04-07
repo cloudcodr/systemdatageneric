@@ -29,9 +29,10 @@ Namespace Serialization.Formatters
         ''' Deserialize a data row into an object of type T, navigating the properties and related tables from the reader.
         ''' </summary>
         ''' <param name="reader">DataReader to return row from.</param>
-        ''' <returns></returns>
+        ''' <param name="schema">Schema of the data reader.</param>
+        ''' <returns>Returns object instance of T.</returns>
         ''' <remarks></remarks>
-        Public Function DeserializeNested(reader As IDataReader) As T Implements IDataReaderFormatter(Of T).DeserializeNested
+        Public Function DeserializeNested(reader As IDataReader, schema As DbSchema) As T Implements IDataReaderFormatter(Of T).DeserializeNested
             ' get the type list nested
             Dim members As List(Of PropertyInfo) = Nothing
             DataSourceFormatterServices.GetSerializableProperties(GetType(T), True, members)
@@ -41,7 +42,9 @@ Namespace Serialization.Formatters
             instance = instance
 
 
-
+            For Each t As DbTableInfo In schema.Tables
+                t = t
+            Next
 
 
             Return instance

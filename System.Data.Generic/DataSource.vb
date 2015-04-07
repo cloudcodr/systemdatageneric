@@ -127,7 +127,7 @@ Public NotInheritable Class DataSource
     ''' <param name="sql">SQL statement.</param>
     ''' <param name="parameters">Parameters.</param>
     ''' <returns>Formattet SQL statement.</returns>
-    ''' <remarks></remarks>
+    ''' <remarks>Behaviour of the SQL statement formatting is based on the <see cref="SerializationSettings.ThreatMinValuesAsNull">ThreatMinValuesAsNull</see> property on <see cref="DataSource.SerializationSettings">SerializationSettings</see> property.</remarks>
     Public Shared Function PrepareSql(ByVal sql As String, ByVal ParamArray parameters() As Object) As String
         Return HelperTools.PrepareSqlExtended(sql, parameters)
     End Function
@@ -838,10 +838,11 @@ Public NotInheritable Class DataSource
                 ' important - open the connection with close and keyinfo!!
                 Using dataReader As SqlDataReader = dataCommand.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.KeyInfo)
                     ' get schema, and pass to the deserializenested
+                    Dim dataSchema As Serialization.DbSchema = Serialization.DbSchema.GetSchema(dataReader)
 
                     While dataReader.Read()
                         ' deserialize the object and reader as a nested hieraticy.
-                        Dim dataReturn As T = sqlFormatter.DeserializeNested(dataReader)
+                        Dim dataReturn As T = sqlFormatter.DeserializeNested(dataReader, dataSchema)
 
                         dataReturnList.Add(dataReturn)
                     End While

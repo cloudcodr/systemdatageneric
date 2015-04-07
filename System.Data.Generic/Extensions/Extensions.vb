@@ -15,7 +15,7 @@ Imports System.Runtime.CompilerServices
 Imports System.Reflection
 
 ''' <summary>
-''' 
+''' Provides the extensions methods.
 ''' </summary>
 ''' <remarks></remarks>
 Module Extensions
@@ -123,6 +123,24 @@ Module Extensions
 
         IsCollection(source, collectionType)
         Return collectionType
+    End Function
+#End Region
+
+#Region "Dictionary extensions"
+    ''' <summary>
+    ''' Converts the value collection of a dictionary to an array.
+    ''' </summary>
+    ''' <typeparam name="T">Type of items.</typeparam>
+    ''' <typeparam name="K">Type of key.</typeparam>
+    ''' <param name="source"></param>
+    ''' <returns>Array of type T.</returns>
+    ''' <remarks></remarks>
+    <Extension()>
+    Friend Function ValuesToArray(Of K, T)(source As Dictionary(Of K, T)) As T()
+        Dim values As T() = New T(source.Count - 1) {}
+        source.Values.CopyTo(values, 0)
+
+        Return values
     End Function
 #End Region
 End Module
