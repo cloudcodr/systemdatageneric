@@ -33,7 +33,7 @@ Namespace Serialization.Formatters
             For i As Integer = 0 To members.Length - 1
                 Try
                     Dim p As PropertyInfo = obj.GetType().GetProperty(members(i).Name)
-                    If p.CanWrite Then
+                    If p IsNot Nothing AndAlso p.CanWrite Then
                         p.SetValue(obj, data(i), Nothing)
                     End If
                 Catch ex As Exception

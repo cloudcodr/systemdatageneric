@@ -73,7 +73,9 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\GenericMapAttribute.vb" />
     <Compile Include="Attributes\IgnorePropertyAttribute.vb" />
+    <Compile Include="Attributes\SingleNestedObjectAttribute.vb" />
     <Compile Include="Extensions\Extensions.vb" />
     <Compile Include="Factory\IDataSource.vb" />
     <Compile Include="Implementations\SqlCeDataSource.vb" />
@@ -83,6 +85,7 @@
     <Compile Include="Serialization\DbSchema.vb" />
     <Compile Include="Serialization\DbTableInfo.vb" />
     <Compile Include="Serialization\IDataReaderFormatter.vb" />
+    <Compile Include="Serialization\NestedDataSourceFormatter.vb" />
     <Compile Include="Serialization\SerializationSettings.vb" />
     <Compile Include="Settings\AzureApplicationSettings.vb" />
     <Compile Include="Settings\ConfigurationHelper.vb" />
@@ -128,8 +131,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="- documentation -\DesignPrinciple.txt" />
     <Content Include="License.txt" />
-    <Content Include="Workitems.txt" />
+    <Content Include="- documentation -\Workitems.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

@@ -758,7 +758,7 @@ Public NotInheritable Class DataSource
     ''' <remarks>Specifying a SQL statement with multiple columns will not change the output. Only the first column will be returned.</remarks>
     ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
     ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
-    Public Function ExecuteList(Of T)(ByVal SQL As String) As List(Of T)
+    Public Function ExecuteList(Of T As Class)(ByVal SQL As String) As List(Of T)
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
             Throw New ArgumentNullException("SQL must be explicitly stated.")
@@ -805,8 +805,22 @@ Public NotInheritable Class DataSource
     ''' </summary>
     ''' <typeparam name="T">Type to return in list. This must be a managed object.</typeparam>
     ''' <param name="SQL">SQL statement to execute. SQL statement must have an 'ORDER BY' statement. Should be a JOIN statement, otherwise please use ExecuteObjects for performance.</param>
+    ''' <param name="navigationProperties">List of property names, which should be populated from the SQL statement.</param>
     ''' <returns>Collections of object, type T - populated based on class references and provided tables.</returns>
-    ''' <remarks></remarks>
+    ''' <remarks>THIS FEATURE IS A PRE-RELEASE. MAY NOT BE STABLE.</remarks>
+    ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
+    ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
+    Public Function ExecuteNObjects(Of T As Class)(SQL As String, navigationProperties() As String) As List(Of T)
+        Throw New NotImplementedException
+    End Function
+
+    ''' <summary>
+    ''' Executes the query, and returns a collection of object by the type T; hieratically compounded by the provided SQL JOIN and realted classes.
+    ''' </summary>
+    ''' <typeparam name="T">Type to return in list. This must be a managed object.</typeparam>
+    ''' <param name="SQL">SQL statement to execute. SQL statement must have an 'ORDER BY' statement. Should be a JOIN statement, otherwise please use ExecuteObjects for performance.</param>
+    ''' <returns>Collections of object, type T - populated based on class references and provided tables.</returns>
+    ''' <remarks>THIS FEATURE IS A PRE-RELEASE. MAY NOT BE STABLE.</remarks>
     ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
     ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     Public Function ExecuteNObjects(Of T As Class)(SQL As String) As List(Of T)
@@ -821,7 +835,7 @@ Public NotInheritable Class DataSource
         End If
 
         ' setup return list
-        Dim dataReturnList As List(Of T) = New List(Of T)
+        Dim dataReturnList As List(Of T) = Nothing
 
         ' initialize the data connection an dopen
         Using dataConnection As SqlConnection = New SqlConnection(Me.ConnectionString)
@@ -833,19 +847,12 @@ Public NotInheritable Class DataSource
 
             Try
                 ' setup formatter of type T
-                Dim sqlFormatter As New Serialization.Formatters.DataSourceFormatter(Of T)
+                Dim sqlFormatter As New Serialization.Formatters.NestedDataSourceFormatter(Of T)
 
                 ' important - open the connection with close and keyinfo!!
                 Using dataReader As SqlDataReader = dataCommand.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.KeyInfo)
-                    ' get schema, and pass to the deserializenested
-                    Dim dataSchema As Serialization.DbSchema = Serialization.DbSchema.GetSchema(dataReader)
+                    dataReturnList = sqlFormatter.DeserializeNested(dataReader)
 
-                    While dataReader.Read()
-                        ' deserialize the object and reader as a nested hieraticy.
-                        Dim dataReturn As T = sqlFormatter.DeserializeNested(dataReader, dataSchema)
-
-                        dataReturnList.Add(dataReturn)
-                    End While
                     dataReader.Close()
                 End Using
             Catch ex As System.Runtime.Serialization.SerializationException
@@ -853,7 +860,7 @@ Public NotInheritable Class DataSource
             Catch ex As SqlException
                 Throw ex
             Catch ex As Exception
-                Throw ex
+                Throw
             Finally
                 dataCommand.Dispose()
                 ' close and return connection to pool
@@ -877,7 +884,7 @@ Public NotInheritable Class DataSource
     ''' <remarks>ExecuteObjects does not support standardized types, as reflection is reversed. This methods tries to match properties of the T type to the data source. Use <see cref="DataSource.ExecuteList">ExecuteList</see> or <see cref="DataSource.ExecuteDictionary">ExecuteDictionary</see>.</remarks>
     ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
     ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
-    Public Function ExecuteObjects(Of T)(ByVal SQL As String) As List(Of T)
+    Public Function ExecuteObjects(Of T As Class)(ByVal SQL As String) As List(Of T)
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
             Throw New ArgumentNullException("SQL must be explicitly stated.")
@@ -935,7 +942,7 @@ Public NotInheritable Class DataSource
     ''' <exception cref="ArgumentNullException">In case the SQL is null.</exception>
     ''' <exception cref="SqlException">In case the underlying connection cause an exception.</exception>
     ''' <remarks></remarks>
-    Public Function ExecuteObject(Of T)(ByVal SQL As String) As T
+    Public Function ExecuteObject(Of T As Class)(ByVal SQL As String) As T
         ' validate SQL input
         If String.IsNullOrEmpty(SQL) Then
             Throw New ArgumentNullException("SQL must be explicitly stated.")

@@ -103,7 +103,11 @@ Public NotInheritable Class TransactionContext
 #End Region
 
 #Region "IDisposable Support"
-    ' IDisposable
+    ''' <summary>
+    ''' Releases the unmanaged resources used by the TransactionContext.
+    ''' </summary>
+    ''' <param name="disposing">Provides a value determing if the state is disposing.</param>
+    ''' <remarks></remarks>
     Protected Sub Dispose(disposing As Boolean)
         If Not Me._disposedValue Then
             If disposing Then
@@ -117,7 +121,10 @@ Public NotInheritable Class TransactionContext
         Me._disposedValue = True
     End Sub
 
-    ' This code added by Visual Basic to correctly implement the disposable pattern.
+    ''' <summary>
+    ''' Releases the unmanaged resources used by the TransactionContext.
+    ''' </summary>
+    ''' <remarks></remarks>
     Public Sub Dispose() Implements IDisposable.Dispose
         ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
         Dispose(True)

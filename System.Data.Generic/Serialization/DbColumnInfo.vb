@@ -69,6 +69,9 @@ Namespace Serialization
         Public RuntimeType As Type
 #End Region
 
+        Public Overrides Function ToString() As String
+            Return Me.FieldName + " (" + Me.FieldPath + ")"
+        End Function
 #Region "Read Methods"
         ''' <summary>
         ''' Returns a long from the field value.
@@ -155,6 +158,14 @@ Namespace Serialization
         ''' <remarks></remarks>
         Protected Friend Function ReadDouble() As Double
             Return CDbl(FieldValue)
+        End Function
+        ''' <summary>
+        ''' Returns a short from the field value.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Protected Friend Function ReadInt16() As Int16
+            Return CShort(FieldValue)
         End Function
 #End Region
     End Class

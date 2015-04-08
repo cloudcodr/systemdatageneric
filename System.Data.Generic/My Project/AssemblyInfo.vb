@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("Provides a generic data access library.")> 
 <Assembly: AssemblyCompany("Arumsoft")> 
 <Assembly: AssemblyProduct("System.Data.Generic")> 
-<Assembly: AssemblyCopyright("Copyright © Arumsof 2015")> 
+<Assembly: AssemblyCopyright("Copyright © Arumsoft 2015")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.9.*")> 
-<Assembly: AssemblyFileVersion("1.9.0.8")> 
+<Assembly: AssemblyVersion("1.9.5473.*")> 
+<Assembly: AssemblyFileVersion("1.9.5473.2392")> 

@@ -11,6 +11,7 @@
 ' COMPANY MAKES NO OTHER WARRANTIES, EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES OF 
 ' MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, IN RELATION TO THE SERVICE.
 
+' TODO: should be Schema
 Namespace Serialization
     ''' <summary>
     ''' Obtains information about the tables and columns of a database.
@@ -20,19 +21,21 @@ Namespace Serialization
 
 #Region "Member variables"
         Private _tables As DbTableInfo()
-        Private _columns As DbColumnInfo()
+        'Private _columns As DbColumnInfo()
 #End Region
 
 #Region "Constructor"
+        ' <param name="columns">Column array of <see cref="DbColumnInfo">DbColumnInfo</see>.</param>
+
         ''' <summary>
         ''' Returns a new instance of the DbSchema class.
         ''' </summary>
         ''' <param name="tables">Table array of <see cref="DbTableInfo">DbTableInfo</see>.</param>
-        ''' <param name="columns">Column array of <see cref="DbColumnInfo">DbColumnInfo</see>.</param>
         ''' <remarks></remarks>
-        Protected Friend Sub New(tables() As DbTableInfo, columns() As DbColumnInfo)
+        Protected Friend Sub New(tables() As DbTableInfo)
             _tables = tables
-            _columns = columns
+            '_columns = columns
+            ', columns() As DbColumnInfo
         End Sub
 #End Region
 
@@ -43,11 +46,11 @@ Namespace Serialization
             End Get
         End Property
 
-        Protected Friend ReadOnly Property Columns As DbColumnInfo()
-            Get
-                Return _columns
-            End Get
-        End Property
+        'Protected Friend ReadOnly Property Columns As DbColumnInfo()
+        '    Get
+        '        Return _columns
+        '    End Get
+        'End Property
 #End Region
 
 #Region "Protected methods"
@@ -62,19 +65,27 @@ Namespace Serialization
 
             ' define the temp. lists
             Dim schemaTables As Dictionary(Of String, DbTableInfo) = New Dictionary(Of String, DbTableInfo)
-            Dim schemaColumns As List(Of DbColumnInfo) = New List(Of DbColumnInfo)
+            ' Dim schemaColumns As List(Of DbColumnInfo) = New List(Of DbColumnInfo)
 
             ' loop through the schema and retrieve the information of table and columns
             For Each schemaRow As DataRow In schemaTable.Rows
-                Dim columnIndex As Integer = schemaRow("ColumnOrdinal")
-                Dim tableName As String = schemaRow("BaseTableName")
+                Dim dbColumnIndex As Integer = schemaRow("ColumnOrdinal")
+                Dim dbTableName As String = schemaRow("BaseTableName")
+
+                Dim currentTable As DbTableInfo = Nothing
+                If Not schemaTables.ContainsKey(dbTableName.ToLower) Then
+                    currentTable = New DbTableInfo With {.TableName = dbTableName}
+                    schemaTables.Add(dbTableName.ToLower, currentTable)
+                Else
+                    currentTable = schemaTables(dbTableName.ToLower)
+                End If
 
                 Dim d1 As Object = schemaRow("ProviderType")
                 Dim d2 As SqlDbType = CType(d1, SqlDbType)
 
-                schemaColumns.Add(New DbColumnInfo() With {
-                                  .TableName = tableName,
-                                  .FieldIndex = columnIndex,
+                currentTable.Columns.Add(New DbColumnInfo() With {
+                                  .TableName = dbTableName,
+                                  .FieldIndex = dbColumnIndex,
                                   .FieldName = schemaRow("BaseColumnName"),
                                   .FieldValue = Nothing,
                                   .DataTypeName = d2.ToString,
@@ -82,22 +93,13 @@ Namespace Serialization
                     })
 
                 ' try to determine the primary key of the table
-                Dim keyColumnIndex As Integer = -1
                 If schemaRow("IsKey") Then
-                    keyColumnIndex = schemaRow("ColumnOrdinal")
+                    currentTable.KeyColumnIndex = schemaRow("ColumnOrdinal")
                 End If
 
-                If Not schemaTables.ContainsKey(tableName.ToLower) Then
-                    schemaTables.Add(tableName.ToLower, New DbTableInfo With {
-                               .TableName = tableName, .KeyColumnIndex = keyColumnIndex})
-                Else
-                    If schemaTables(tableName.ToLower).KeyColumnIndex = -1 Then
-                        schemaTables(tableName.ToLower).KeyColumnIndex = keyColumnIndex
-                    End If
-                End If
             Next
 
-            Return New DbSchema(schemaTables.ValuesToArray, schemaColumns.ToArray)
+            Return New DbSchema(schemaTables.ValuesToArray)
         End Function
 #End Region
     End Class

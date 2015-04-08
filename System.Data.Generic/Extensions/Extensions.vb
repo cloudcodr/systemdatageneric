@@ -19,6 +19,26 @@ Imports System.Reflection
 ''' </summary>
 ''' <remarks></remarks>
 Module Extensions
+#Region "Array extensions"
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="arr"></param>
+    ''' <param name="value"></param>
+    ''' <remarks></remarks>
+    <Extension()>
+    Friend Sub AddValue(ByRef arr As Array, value As Object)
+        If arr Is Nothing Then
+            arr = System.Array.CreateInstance(value.GetType, 0)
+        End If
+        Dim newArrayLength As Integer = arr.Length
+        Dim tempArray As Array = System.Array.CreateInstance(value.GetType, newArrayLength + 1)
+        arr.CopyTo(tempArray, 0)
+        tempArray.SetValue(value, newArrayLength)
+        arr = tempArray
+    End Sub
+#End Region
+
 #Region "String extensions"
     ''' <summary>
     ''' Returns a value indicating whether specified System.String value occurs in the string, using the comparision provided.
@@ -44,7 +64,7 @@ Module Extensions
     <Extension()>
     Friend Function PropertyPath(source As PropertyInfo) As String
         Dim propertyType As Type = source.PropertyType
-        Return source.DeclaringType.Name + "." + propertyType.Name
+        Return source.DeclaringType.Name + "." + source.Name
     End Function
 
     ''' <summary>
@@ -95,20 +115,7 @@ Module Extensions
     ''' <remarks></remarks>
     <Extension()>
     Friend Function IsCollection(source As PropertyInfo) As Boolean
-        Dim propertyType As Type = source.PropertyType
-
-        ' TODO: how about simple "HashTable, List, Dictionary etc.
-
-        ' An Object() array
-        If propertyType.IsArray Then
-            Return True
-        End If
-        ' An Enum...(of T), List(of T) etc.
-        If propertyType.IsGenericType Then
-            Return True
-        End If
-
-        Return False
+        Return IsCollection(source, Nothing)
     End Function
 
     ''' <summary>

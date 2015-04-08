@@ -17,6 +17,11 @@ Namespace Serialization
     ''' </summary>
     ''' <remarks></remarks>
     Public NotInheritable Class DbTableInfo
+
+        Public Sub New()
+            Me.Columns = New List(Of DbColumnInfo)
+        End Sub
+
 #Region "Public properties"
         ''' <summary>
         ''' Name of the data table.
@@ -28,6 +33,8 @@ Namespace Serialization
         ''' </summary>
         ''' <remarks></remarks>
         Public KeyColumnIndex As Integer
+
+        Public Columns As List(Of DbColumnInfo)
 #End Region
 
 #Region "Public methods"

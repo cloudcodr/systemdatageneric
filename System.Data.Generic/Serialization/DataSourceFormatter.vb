@@ -17,6 +17,7 @@ Imports System.Runtime.Serialization
 Imports System.Runtime.Serialization.Formatters
 
 Namespace Serialization.Formatters
+
     ''' <summary>
     ''' Provides a serialization formatter for the data source.
     ''' </summary>
@@ -24,50 +25,6 @@ Namespace Serialization.Formatters
     ''' <remarks></remarks>
     Public NotInheritable Class DataSourceFormatter(Of T)
         Implements IDataReaderFormatter(Of T)
-
-        ''' <summary>
-        ''' Deserialize a data row into an object of type T, navigating the properties and related tables from the reader.
-        ''' </summary>
-        ''' <param name="reader">DataReader to return row from.</param>
-        ''' <param name="schema">Schema of the data reader.</param>
-        ''' <returns>Returns object instance of T.</returns>
-        ''' <remarks></remarks>
-        Public Function DeserializeNested(reader As IDataReader, schema As DbSchema) As T Implements IDataReaderFormatter(Of T).DeserializeNested
-            ' get the type list nested
-            Dim members As List(Of PropertyInfo) = Nothing
-            DataSourceFormatterServices.GetSerializableProperties(GetType(T), True, members)
-
-            ' instanciate a new version
-            Dim instance As Object = FormatterServices.GetSafeUninitializedObject(GetType(T))
-            instance = instance
-
-
-            For Each t As DbTableInfo In schema.Tables
-                t = t
-            Next
-
-
-            Return instance
-
-
-            'Dim members() As PropertyInfo = DataSourceFormatterServices.GetSerializableProperties(GetType(T))
-            ''Dim u = members(0).PropertyPath
-            'u = u
-
-            For Each m As PropertyInfo In members
-                Console.WriteLine(m.PropertyPath)
-            Next
-
-            Throw New NotImplementedException
-
-            ' retrieve property info array for the type and navigate any child properties
-            ' that is not of IsSystemType
-            '    Dim nestedMembers() As PropertyInfoList
-
-            '     Dim schemaDt = dataReader.GetSchemaTable()
-
-
-        End Function
 
         ''' <summary>
         ''' Deserialize a data row from the reader.
@@ -105,9 +62,11 @@ Namespace Serialization.Formatters
         ''' <param name="fields">Data fields from the data source.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function MapAndDeserializePrimities(members() As MemberInfo, fields() As DbColumnInfo) As Object()
+        Protected Friend Shared Function MapAndDeserializePrimities(members() As MemberInfo, fields() As DbColumnInfo) As Object()
             Dim retVal As Object() = New Object(members.Length - 1) {}
+            ' New - but fails Dim retVal As Object() = New Object(fields.Length - 1) {}
 
+            ' Old - but works
             For i As Integer = 0 To members.Length - 1
                 'members(i).Name 
                 For Each dataField As DbColumnInfo In fields
@@ -118,6 +77,20 @@ Namespace Serialization.Formatters
                 Next
             Next
 
+            ' New- but fails
+            'For Each dataField As DbColumnInfo In fields
+            '    For i As Integer = 0 To members.Length - 1
+            '        If String.Compare(dataField.FieldName, members(i).Name, True) = 0 Then
+            '            Try
+            '                retVal(i) = DeserializePrimitive(dataField)
+            '            Catch ex As Exception
+            '                ex = ex
+            '            End Try
+            '            Exit For
+            '        End If
+            '    Next
+            'Next                
+
             Return retVal
         End Function
 
@@ -127,7 +100,7 @@ Namespace Serialization.Formatters
         ''' <param name="field">Field to deserialize.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function DeserializePrimitive(field As DbColumnInfo) As Object
+        Protected Friend Shared Function DeserializePrimitive(field As DbColumnInfo) As Object
             Dim fieldType As Type = field.RuntimeType
             Select Case Type.GetTypeCode(fieldType)
                 Case TypeCode.Char
@@ -140,7 +113,9 @@ Namespace Serialization.Formatters
                     Return field.ReadDecimal
                 Case TypeCode.Int64, TypeCode.UInt64
                     Return field.ReadLong
-                Case TypeCode.Int16, TypeCode.Int32, TypeCode.UInt16, TypeCode.UInt32
+                Case TypeCode.Int16, TypeCode.UInt16
+                    Return field.ReadInt16
+                Case TypeCode.Int32, TypeCode.UInt32
                     Return field.ReadInt
                 Case TypeCode.Boolean
                     Return field.ReadBool
